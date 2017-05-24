@@ -1,0 +1,36 @@
+{
+  "linters": {
+    "chmod": {
+      "type": "chmod"
+    },
+    "filename": {
+      "type": "filename"
+    },
+    "json": {
+      "type": "json",
+      "include": [
+        "(^\\.arcconfig$)",
+        "(^\\.arclint$)",
+        "(\\.json$)"
+      ]
+    },
+    "pep8": {
+      "type": "pep8",
+      "include": [
+        "(\\.py$)"
+      ],
+      "severity": {
+        "E401": "warning"
+      }
+    },
+    "flake8": {
+      "type": "flake8",
+      "include": [
+        "(\\.py$)"
+      ],
+      "severity": {
+        "E901": "advice"
+      }
+    }
+  }
+}
