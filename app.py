@@ -117,10 +117,15 @@ def generate_queue_key():
     return str(uuid.uuid4())
 
 
+def get_queue_name(queue_key):
+    """Map a queue name with its key."""
+    return "delivery-" + queue_key
+
+
 def add_broker_queue(exchange_name, routing_key):
     """Add a queue to the broker, bind to the exchange."""
     queue_key = generate_queue_key()
-    queue_name = "delivery-" + queue_key
+    queue_name = get_queue_name(queue_key)
 
     connection = get_broker_connection(service['config'])
     channel = connection.channel()
@@ -132,6 +137,13 @@ def add_broker_queue(exchange_name, routing_key):
     connection.close(reply_text="Operation done")
 
     return queue_key
+
+
+def delete_broker_queue(queue_name, force_queue_deletion):
+    connection = get_broker_connection(service['config'])
+    channel = connection.channel()
+    channel.queue_delete(queue=queue_name, if_empty=not force_queue_deletion)
+    connection.close(reply_text="Operation done")
 
 
 def get_variable_from_request(key, default_value=None):
@@ -188,6 +200,26 @@ def register_consumer():
 
     # Returns result
     return jsonify(key=queue_key)
+
+
+@app.route(endpoint + "/unregister_consumer", methods=['POST'])
+def unregister_consumer():
+    """Unregister a queue key."""
+
+    # Reads request
+    if not request.json or "key" not in request.json:
+        abort(400)
+
+    queue = get_queue_name(request.json["key"])
+    force_delete = get_variable_from_request("force", False)
+
+    # Handles request
+    try:
+        delete_broker_queue(queue, force_delete)
+        return jsonify(key=queue, success=True,
+                       result="Queue deletion request sent to the broker.")
+    except pika.exceptions.ChannelClosed as err:
+        return error_handler(err)
 
 
 #   -------------------------------------------------------------
