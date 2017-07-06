@@ -107,6 +107,7 @@ def get_default_exchange_name():
     """Gets from the configuration the default exchange,
        or return a 400 if undefined."""
     if service['config']['DefaultExchange'] is None:
+        print("Client wants the default exchange, unspecified in config.")
         abort(400)
 
     return service['config']['DefaultExchange']
