@@ -131,9 +131,21 @@ def add_broker_queue(exchange_name, routing_key):
     channel = connection.channel()
     channel.queue_declare(durable=True,
                           queue=queue_name)
-    channel.queue_bind(exchange=exchange_name,
-                       queue=queue_name,
-                       routing_key=routing_key)
+    try:
+        channel.queue_bind(exchange=exchange_name,
+                           queue=queue_name,
+                           routing_key=routing_key)
+    except pika.exceptions.ChannelClosed as err:
+        # We've created a queue but we can't use it,
+        # so let's try to delete it through a new connection.
+        try:
+            print("Deleting unused queue: {0}".format(queue_name))
+            delete_broker_queue(queue_name, True)
+        except pika.exceptions.ChannelClosed:
+            pass
+
+        raise err
+
     connection.close(reply_text="Operation done")
 
     return queue_key
