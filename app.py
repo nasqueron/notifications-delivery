@@ -87,9 +87,9 @@ def get_credentials(config):
 
 def get_broker_connection_parameters(config):
     return pika.ConnectionParameters(
-            host=config['Broker']['Host'],
-            credentials=get_credentials(config),
-            virtual_host=config['Broker']['Vhost'])
+        host=config['Broker']['Host'],
+        credentials=get_credentials(config),
+        virtual_host=config['Broker']['Vhost'])
 
 
 def get_broker_connection(config):
