@@ -255,8 +255,8 @@ def run_application(web_application):
     global service
     service = initialize_application()
 
-    if __name__ == "__main__":
-        web_application.run(host="0.0.0.0")
+    web_application.run(host="0.0.0.0")
 
 
-run_application(app)
+if __name__ == '__main__':
+    run_application(app)
