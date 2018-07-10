@@ -11,8 +11,8 @@
 #   -------------------------------------------------------------
 
 """
-This module connects to the message broker, fire a web server,
-and allow to interact through the broker from HTTP requests.
+This module connects to the message broker, fires a web server,
+and allows to interact through the broker from HTTP requests.
 """
 
 from flask import Flask, abort, jsonify, request
@@ -37,7 +37,7 @@ def mandatory_environment_variables():
 
 
 def check_config():
-    """Ensure configuration is complete."""
+    """Ensures configuration is complete."""
     return set(mandatory_environment_variables()).issubset(os.environ)
 
 
@@ -77,7 +77,7 @@ def get_default_exchange():
 
 
 def get_credentials(config):
-    """Get credentials to connect to the broker from the configuration."""
+    """Gets credentials to connect to the broker from the configuration."""
     return pika.PlainCredentials(
         username=config['Broker']['User'],
         password=config['Broker']['Password'],
@@ -93,7 +93,7 @@ def get_broker_connection_parameters(config):
 
 
 def get_broker_connection(config):
-    """Connect to the broker."""
+    """Connects to the broker."""
     parameters = get_broker_connection_parameters(config)
     return pika.BlockingConnection(parameters)
 
@@ -119,12 +119,12 @@ def generate_queue_key():
 
 
 def get_queue_name(queue_key):
-    """Map a queue name with its key."""
+    """Maps a queue name with its key."""
     return "delivery-" + queue_key
 
 
 def add_broker_queue(exchange_name, routing_key):
-    """Add a queue to the broker, bind to the exchange."""
+    """Adds a queue to the broker, bind to the exchange."""
     queue_key = generate_queue_key()
     queue_name = get_queue_name(queue_key)
 
@@ -140,7 +140,7 @@ def add_broker_queue(exchange_name, routing_key):
         # We've created a queue but we can't use it,
         # so let's try to delete it through a new connection.
         try:
-            print("Deleting unused queue: {0}".format(queue_name))
+            print("Deleting not used queue: {0}".format(queue_name))
             delete_broker_queue(queue_name, True)
         except pika.exceptions.ChannelClosed:
             pass
@@ -168,7 +168,7 @@ def get_variable_from_request(key, default_value=None):
 
 
 def get_exchange_from_request():
-    """Get the exchange name from the request, the environment, or abort."""
+    """Gets the exchange name from the request, the environment, or aborts."""
     exchange_name = get_variable_from_request("exchange")
 
     if exchange_name is None:
@@ -190,13 +190,13 @@ def error_handler(err):
 
 @app.route(endpoint + "/status")
 def status():
-    """Determine if the application returns a 200 on GET request."""
+    """Determines if the application returns a 200 on GET request."""
     return "ALIVE"
 
 
 @app.route(endpoint + "/register_consumer", methods=['POST'])
 def register_consumer():
-    """Subscribe to an exchange, record the queue, send queue key."""
+    """Subscribes to an exchange, records the queue, sends queue key."""
 
     # Reads request
     if not request.json:
@@ -241,14 +241,14 @@ def unregister_consumer():
 
 
 def initialize_application():
-    """Initialize a container with required services."""
+    """Initializes a container with required services."""
     return {
         'config': get_config()
     }
 
 
 def run_application(web_application):
-    """Run the server."""
+    """Runs the server."""
     if not check_config():
         sys.exit(1)
 
